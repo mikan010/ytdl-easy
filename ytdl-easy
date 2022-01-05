@@ -155,7 +155,9 @@ do
                 ;;
 	    -U | --upgrade )
 		    echo "Updating..." &&
-		    git clone URL /usr/local/bin &&
+		    rm -fr $HOME/Download/$(basename "$0") &&
+		    git clone https://github.com/mikan010/ytdl-easy $HOME/Download/$(basename "$0") &&
+		    cp $HOME/Download/$(basename "$0")/$(basename "$0") /usr/local/bin/ &&
 		    echo "Complete."
 		    exit 1
 		;;
