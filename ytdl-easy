@@ -1,11 +1,12 @@
 #!/bin/bash
 
 #Version
-VERSION=1.0
+VERSION=1.1
 
 #Settings
 MOVIE="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --sub-lang live_chat -f bestvideo+bestaudio --throttled-rate 1M -o"
 AUDIO="yt-dlp -i --throttled-rate 1M -f bestaudio -x --audio-format"
+NICONICO_MOVIE="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --sub-lang live_chat -f best --throttled-rate 1M -o"
 COOKIEDIR=$HOME"/Documents/cookies/"
 MAXTHREAD=5
 PRFNUM=1
@@ -25,13 +26,15 @@ Version: $VERSION
 					(default): best
 					m4a, mp3 are conveted from best.
 
-  -c COOKIE, --cookie=COOKIE		The name of the cookie to use.
+  -c COOKIE, --cookie=COOKIE		The name of the cookie to use(for YouTube).
 
   -d DIR, --dir=DIR			Directory for download.
 
   -h, --help				Display usage.
 
   -H, --help-all			Display usage-all.
+
+  -n, --niconico			Download from nicoVideo.
 
   -p PROFILE, --profile=PROFILE		Select the name format used when saving the video.
 					(default): $PRFNUM
@@ -43,6 +46,10 @@ Version: $VERSION
 					6: channel_[channelID] / date-title / title_[ID].ext
 
   -U, --upgrade				Upgrade this program(Requires "root").
+
+  --user=USER				Username or Mail(for NicoVideo).
+
+  --pass=PASSWORD			Password(for NicoVideo).
 
 EOM
 }
@@ -70,13 +77,15 @@ Version: $VERSION
                                         (default): best
                                         m4a, mp3 are conveted from best.
 
-  -c COOKIE, --cookie=COOKIE            The name of the cookie to use.
+  -c COOKIE, --cookie=COOKIE            The name of the cookie to use(for YouTube).
 
   -d DIR, --dir=DIR                     Directory for download.
 
   -h, --help                            Display usage.
 
   -H, --help-all                        Display usage-all.
+
+  -n, --niconico                        Download from nicoVideo.
 
   -p PROFILE, --profile=PROFILE         Select the name format used when saving the video.
                                         (default): $PRFNUM
@@ -88,6 +97,10 @@ Version: $VERSION
                                         6: channel_[channelID] / date-title / title_[ID].ext
 
   -U, --upgrade                         Upgrade this program(Requires "root").
+
+  --user=USER				Username or Mail(for NicoVideo).
+
+  --pass=PASSWORD			Password(for NicoVideo).
 
 EOM
 }
@@ -115,7 +128,7 @@ do
 	        ;;
 	    -c | --cookie | --cookie=*? )
 	        if [[ "$1" =~ ^--cookie= ]]; then
-		    USECOOKIE=--cookies $COOKIEDIR$(echo $1 | sed -e 's/^--cookie=//')
+		    USECOOKIE="--cookies "$COOKIEDIR$(echo $1 | sed -e 's/^--cookie=//')
 		elif [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
 		    echo "'cookie' requires an argument."
 		    exit 1
@@ -143,6 +156,9 @@ do
 		    usage-all
 		    exit 1
 		;;
+	    -n | --niconico )
+		    NICONICO=1 
+		;;
 	    -p | --profile | --profile=*? )
 		if [[ "$1" =~ ^--profile= ]]; then
                     PRFNUM=$(echo $1 | sed -e 's/^--profile=//')
@@ -154,12 +170,34 @@ do
                 fi
                 ;;
 	    -U | --upgrade )
-		    echo "Updating..." &&
-		    rm -fr $HOME/Download/$(basename "$0") &&
-		    git clone https://github.com/mikan010/ytdl-easy $HOME/Download/$(basename "$0") &&
-		    cp $HOME/Download/$(basename "$0")/$(basename "$0") /usr/local/bin/ &&
-		    echo "Complete."
-		    exit 1
+		echo "Updating..." &&
+		rm -fr $HOME/Download/$(basename "$0") &&
+		git clone https://github.com/mikan010/ytdl-easy $HOME/Download/$(basename "$0") &&
+		cp $HOME/Download/$(basename "$0")/$(basename "$0") /usr/local/bin/ &&
+		echo "Complete."
+		exit 1
+		;;
+	    --user | --user= )
+		if [[ "$1" =~ ^--user= ]]; then
+                    USER="-u "$(echo $1 | sed -e 's/^--user=//')
+                elif [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
+                    echo "'user' requires an argument."
+                    exit 1
+                else
+                    USER="-u "$2
+                    shift
+                fi
+		;;
+	    --pass | --pass= )
+		if [[ "$1" =~ ^--pass= ]]; then
+                    PASS="-p "$(echo $1 | sed -e 's/^--pass=//')
+                elif [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
+                    echo "'user' requires an argument."
+                    exit 1
+                else
+                    PASS="-p "$2
+                    shift
+                fi
 		;;
 	    -* )
 	        echo "Illegal option -- '$(echo $1 | sed 's/^-*//')'."
@@ -203,9 +241,11 @@ case "$AUDIOFMT" in
 	"mp3" ) DLFMT="mp3" ;;
 esac
 
-# Process when Audio only was selected
+# Process when Audio only or Niconico was seletecte.
 if [[ -n "$AUDIOFMT" ]]; then
     EXECCMD="$AUDIO $DLFMT -o $PRF $USECOOKIE"
+elif [[ -n "$NICONICO" ]]; then
+    EXECCMD="$NICONICO_MOVIE $PRF $USER $PASS"
 else
     EXECCMD="$MOVIE $PRF $USECOOKIE"
 fi
