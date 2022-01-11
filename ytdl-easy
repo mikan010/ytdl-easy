@@ -4,7 +4,7 @@
 VERSION=1.1
 
 #Settings
-MOVIE="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --sub-lang live_chat -f bestvideo+bestaudio --throttled-rate 1M -o"
+MOVIE="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --sub-lang live_chat --write-annotations --no-progress --add-metadata -f bestvideo+bestaudio --throttled-rate 1M -o"
 AUDIO="yt-dlp -i --throttled-rate 1M -f bestaudio -x --audio-format"
 NICONICO_MOVIE="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --sub-lang live_chat -f best --throttled-rate 1M -o"
 COOKIEDIR=$HOME"/Documents/cookies/"
