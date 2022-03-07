@@ -22,38 +22,38 @@ Usage: cat hoge.txt | $(basename "$0") [OPTION]
 Version: $VERSION
 
 [OPTION]
-  -a FORMAT, --audio=FORMAT				Specify this option when you want to download only the AUDIO.	
-										FORMAT: best, m4a, mp3
-										(default): best
-										m4a, mp3 are conveted from best.
+  -a FORMAT, --audio=FORMAT			Specify this option when you want to download only the AUDIO.	
+							FORMAT: best, m4a, mp3
+							(default): best
+							m4a, mp3 are conveted from best.
 
   -c COOKIE, --cookie=COOKIE			The name of the cookie to use(for YouTube).
 
-  -d DIR, --dir=DIR						Directory for download.
+  -d DIR, --dir=DIR				Directory for download.
 
-  -h, --help							Display usage.
+  -h, --help					Display usage.
 
-  -H, --help-all						Display usage-all.
+  -H, --help-all				Display usage-all.
 
-  -n, --niconico						Download from nicoVideo.
+  -n, --niconico				Download from nicoVideo.
 
-  -t, --twitch							Download from twitch
+  -t, --twitch					Download from twitch
 
   -p PROFILE, --profile=PROFILE			Select the name format used when saving the video.
-										(default): $PRFNUM
-										1: title_[ID].ext
-										2: title.ext
-										3: date-title / title_[ID].ext
-										4: date-title-channel_[channelID] / title_[ID].ext
-										5: title-channel_[channelID] / title_[ID].ext
-										6: channel_[channelID] / date-title / title_[ID].ext
-										7: date-[ID] / title.ext
+							(default): $PRFNUM
+							1: title_[ID].ext
+							2: title.ext
+							3: date-title / title_[ID].ext
+							4: date-title-channel_[channelID] / title_[ID].ext
+							5: title-channel_[channelID] / title_[ID].ext
+							6: channel_[channelID] / date-title / title_[ID].ext
+							7: date-[ID] / title.ext
 
-  -U, --upgrade							Upgrade this program(Requires "root").
+  -U, --upgrade					Upgrade this program(Requires "root").
 
-  --user=USER							Username or Mail(for NicoVideo).
+  --user=USER					Username or Mail(for NicoVideo).
 
-  --pass=PASSWORD						Password(for NicoVideo).
+  --pass=PASSWORD				Password(for NicoVideo).
 
 EOM
 }
@@ -76,38 +76,38 @@ Version: $VERSION
 
 
 [OPTION]
-  -a FORMAT, --audio=FORMAT             Specify this option when you want to download only the AUDIO.
-                                        FORMAT: best, m4a, mp3
-                                        (default): best
-                                        m4a, mp3 are conveted from best.
+  -a FORMAT, --audio=FORMAT			Specify this option when you want to download only the AUDIO.
+                                       			FORMAT: best, m4a, mp3
+                                       			(default): best
+                                       			m4a, mp3 are conveted from best.
 
-  -c COOKIE, --cookie=COOKIE            The name of the cookie to use(for YouTube).
+  -c COOKIE, --cookie=COOKIE           		The name of the cookie to use(for YouTube).
 
-  -d DIR, --dir=DIR                     Directory for download.
+  -d DIR, --dir=DIR                     	Directory for download.
 
-  -h, --help                            Display usage.
+  -h, --help                           		Display usage.
 
-  -H, --help-all                        Display usage-all.
+  -H, --help-all                       		Display usage-all.
 
-  -n, --niconico                        Download from nicoVideo.
+  -n, --niconico                        	Download from nicoVideo.
 
-  -t, --twitch							Download from twitch.
+  -t, --twitch					Download from twitch.
 
-  -p PROFILE, --profile=PROFILE         Select the name format used when saving the video.
-                                        (default): $PRFNUM
-                                        1: title_[ID].ext
-                                        2: title.ext
-                                        3: date-title / title_[ID].ext
-                                        4: date-title-channel_[channelID] / title_[ID].ext
-                                        5: title-channel_[channelID] / title_[ID].ext
-                                        6: channel_[channelID] / date-title / title_[ID].ext
-										7: date-[ID] / title.ext
+  -p PROFILE, --profile=PROFILE         	Select the name format used when saving the video.
+                                        		(default): $PRFNUM
+                                        		1: title_[ID].ext
+                                        		2: title.ext
+                                        		3: date-title / title_[ID].ext
+                                        		4: date-title-channel_[channelID] / title_[ID].ext
+                                        		5: title-channel_[channelID] / title_[ID].ext
+                                        		6: channel_[channelID] / date-title / title_[ID].ext
+							7: date-[ID] / title.ext
 
-  -U, --upgrade                         Upgrade this program(Requires "root").
+  -U, --upgrade                         	Upgrade this program(Requires "root").
 
-  --user=USER							Username or Mail(for NicoVideo).
+  --user=USER					Username or Mail(for NicoVideo).
 
-  --pass=PASSWORD						Password(for NicoVideo).
+  --pass=PASSWORD				Password(for NicoVideo).
 
 EOM
 }
