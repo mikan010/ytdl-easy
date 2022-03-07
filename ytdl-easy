@@ -1,12 +1,13 @@
 #!/bin/bash
 
 #Version
-VERSION=1.4
+VERSION=1.5
 
 #Settings
 MOVIE="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata -f bestvideo+bestaudio --throttled-rate 1M --limit-rate 64M -o"
 AUDIO="yt-dlp -i --throttled-rate 1M -f bestaudio -x --audio-format"
 NICONICO_MOVIE="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --sub-lang live_chat -f best --throttled-rate 1M -o"
+TWITCH="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata --throttled-rate 1M --limit-rate 64M -o"
 COOKIEDIR=$HOME"/Documents/cookies/"
 MAXTHREAD=5
 PRFNUM=1
@@ -21,35 +22,38 @@ Usage: cat hoge.txt | $(basename "$0") [OPTION]
 Version: $VERSION
 
 [OPTION]
-  -a FORMAT, --audio=FORMAT		Specify this option when you want to download only the AUDIO.	
-					FORMAT: best, m4a, mp3
-					(default): best
-					m4a, mp3 are conveted from best.
+  -a FORMAT, --audio=FORMAT				Specify this option when you want to download only the AUDIO.	
+										FORMAT: best, m4a, mp3
+										(default): best
+										m4a, mp3 are conveted from best.
 
-  -c COOKIE, --cookie=COOKIE		The name of the cookie to use(for YouTube).
+  -c COOKIE, --cookie=COOKIE			The name of the cookie to use(for YouTube).
 
-  -d DIR, --dir=DIR			Directory for download.
+  -d DIR, --dir=DIR						Directory for download.
 
-  -h, --help				Display usage.
+  -h, --help							Display usage.
 
-  -H, --help-all			Display usage-all.
+  -H, --help-all						Display usage-all.
 
-  -n, --niconico			Download from nicoVideo.
+  -n, --niconico						Download from nicoVideo.
 
-  -p PROFILE, --profile=PROFILE		Select the name format used when saving the video.
-					(default): $PRFNUM
-					1: title_[ID].ext
-					2: title.ext
-					3: date-title / title_[ID].ext
-					4: date-title-channel_[channelID] / title_[ID].ext
-					5: title-channel_[channelID] / title_[ID].ext
-					6: channel_[channelID] / date-title / title_[ID].ext
+  -t, --twitch							Download from twitch
 
-  -U, --upgrade				Upgrade this program(Requires "root").
+  -p PROFILE, --profile=PROFILE			Select the name format used when saving the video.
+										(default): $PRFNUM
+										1: title_[ID].ext
+										2: title.ext
+										3: date-title / title_[ID].ext
+										4: date-title-channel_[channelID] / title_[ID].ext
+										5: title-channel_[channelID] / title_[ID].ext
+										6: channel_[channelID] / date-title / title_[ID].ext
+										7: date-[ID] / title.ext
 
-  --user=USER				Username or Mail(for NicoVideo).
+  -U, --upgrade							Upgrade this program(Requires "root").
 
-  --pass=PASSWORD			Password(for NicoVideo).
+  --user=USER							Username or Mail(for NicoVideo).
+
+  --pass=PASSWORD						Password(for NicoVideo).
 
 EOM
 }
@@ -87,6 +91,8 @@ Version: $VERSION
 
   -n, --niconico                        Download from nicoVideo.
 
+  -t, --twitch							Download from twitch.
+
   -p PROFILE, --profile=PROFILE         Select the name format used when saving the video.
                                         (default): $PRFNUM
                                         1: title_[ID].ext
@@ -95,12 +101,13 @@ Version: $VERSION
                                         4: date-title-channel_[channelID] / title_[ID].ext
                                         5: title-channel_[channelID] / title_[ID].ext
                                         6: channel_[channelID] / date-title / title_[ID].ext
+										7: date-[ID] / title.ext
 
   -U, --upgrade                         Upgrade this program(Requires "root").
 
-  --user=USER				Username or Mail(for NicoVideo).
+  --user=USER							Username or Mail(for NicoVideo).
 
-  --pass=PASSWORD			Password(for NicoVideo).
+  --pass=PASSWORD						Password(for NicoVideo).
 
 EOM
 }
@@ -157,7 +164,10 @@ do
 		    exit 1
 		;;
 	    -n | --niconico )
-		    NICONICO=1 
+		    NICONICO=1
+		;;
+		-t | --twitch )
+			TWITCH=1
 		;;
 	    -p | --profile | --profile=*? )
 		if [[ "$1" =~ ^--profile= ]]; then
@@ -228,6 +238,7 @@ case "$PRFNUM" in
 	"4" ) PRF='%(release_date,upload_date|Unknown)s-%(title)s-%(channel)s_[%(channel_id)s]/%(title)s_[%(id)s].%(ext)s' ;;
         "5" ) PRF='%(title)s-%(channel)s_[%(channel_id)s]/%(title)s_[%(id)s].%(ext)s' ;;
 	"6" ) PRF='%(channel)s_[%(channel_id)s]/%(release_date,upload_date|Unknown)s-%(title)s/%(title)s_[%(id)s].%(ext)s' ;;
+	"7" ) PRF='%(release_date,upload_date|Unknown)s-[%(id)s]/%(title)s.%(ext)s' ;;
 	* )
 	    echo $PRFNUM "is not supported Profile number (option: -p,--profile)."
 	    exit 1
@@ -246,6 +257,8 @@ if [[ -n "$AUDIOFMT" ]]; then
     EXECCMD="$AUDIO $DLFMT -o $PRF $USECOOKIE"
 elif [[ -n "$NICONICO" ]]; then
     EXECCMD="$NICONICO_MOVIE $PRF $USER $PASS"
+elif [[ -n "$TWITCH" ]]; then
+	EXECCMD="$TWITCH $PRF $USER $PASS"
 else
     EXECCMD="$MOVIE $PRF $USECOOKIE"
 fi
