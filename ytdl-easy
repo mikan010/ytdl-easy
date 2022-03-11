@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Version
-VERSION=1.5.2
+VERSION=1.6.0
 
 #Settings
 MOVIE="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata -f bestvideo+bestaudio --throttled-rate 1M --limit-rate 64M -o"
@@ -10,6 +10,7 @@ NICONICO_MOVIE="yt-dlp -i --write-thumbnail --write-description --write-info-jso
 TWITCH="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata --throttled-rate 1M --limit-rate 64M -o"
 COOKIEDIR=$HOME"/Documents/cookies/"
 MAXTHREAD=5
+WEBSITE=ytb
 PRFNUM=1
 
 
@@ -37,7 +38,9 @@ Version: $VERSION
 
   -n, --niconico				Download from nicoVideo.
 
-  -t, --twitch					Download from twitch
+  -t, --twitch					Download from twitch.
+
+  -y, --youtube					Download from YouTube(Default).
 
   -p PROFILE, --profile=PROFILE			Select the name format used when saving the video.
 							(default): $PRFNUM
@@ -92,6 +95,8 @@ Version: $VERSION
   -n, --niconico                        	Download from nicoVideo.
 
   -t, --twitch					Download from twitch.
+
+  -y, --youtube					Download from YouTube(Default).
 
   -p PROFILE, --profile=PROFILE         	Select the name format used when saving the video.
                                         		(default): $PRFNUM
@@ -164,10 +169,13 @@ do
 		    exit 1
 		;;
 	    -n | --niconico )
-		    NICONICO=1
+		    WEBSITE=niconico
 		;;
-		-t | --twitch )
-			TWITCH=1
+	    -t | --twitch )
+		    WEBSITE=twitch
+		;;
+	    -y | --youtube )
+		    WEBSITE=ytb
 		;;
 	    -p | --profile | --profile=*? )
 		if [[ "$1" =~ ^--profile= ]]; then
@@ -255,12 +263,12 @@ esac
 # Process when Audio only or Niconico was seletecte.
 if [[ -n "$AUDIOFMT" ]]; then
     EXECCMD="$AUDIO $DLFMT -o $PRF $USECOOKIE"
-elif [[ -n "$NICONICO" ]]; then
-    EXECCMD="$NICONICO_MOVIE $PRF $USER $PASS"
-elif [[ -n "$TWITCH" ]]; then
-	EXECCMD="$TWITCH $PRF $USER $PASS"
 else
-    EXECCMD="$MOVIE $PRF $USECOOKIE"
+    case "$WEBSITE" in
+	"ytb" ) EXECCMD="$MOVIE $PRF $USECOOKIE" ;;
+	"twitch" ) EXECCMD="$TWITCH $PRF" ;;
+	"niconico" ) EXECCMD="$NICONICO_MOVIE $PRF $USER $PASS" ;;
+    esac
 fi
 
 # Change directory for DL
