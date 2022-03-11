@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Version
-VERSION=1.6.0
+VERSION=1.6.1
 
 #Settings
 MOVIE="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata -f bestvideo+bestaudio --throttled-rate 1M --limit-rate 64M -o"
@@ -36,11 +36,9 @@ Version: $VERSION
 
   -H, --help-all				Display usage-all.
 
-  -n, --niconico				Download from nicoVideo.
-
-  -t, --twitch					Download from twitch.
-
-  -y, --youtube					Download from YouTube(Default).
+  -w WEBSITE, --website=WEBSITE			Select the name for download website.
+							(default): $WEBSITE
+							ytb(YouTube), twitch, niconico
 
   -p PROFILE, --profile=PROFILE			Select the name format used when saving the video.
 							(default): $PRFNUM
@@ -92,11 +90,9 @@ Version: $VERSION
 
   -H, --help-all                       		Display usage-all.
 
-  -n, --niconico                        	Download from nicoVideo.
-
-  -t, --twitch					Download from twitch.
-
-  -y, --youtube					Download from YouTube(Default).
+  -w WEBSITE, --website=WEBSITE			Select the name for download website.
+							(default): $WEBSITE
+							ytb(YouTube), twitch, niconico
 
   -p PROFILE, --profile=PROFILE         	Select the name format used when saving the video.
                                         		(default): $PRFNUM
@@ -168,15 +164,17 @@ do
 		    usage-all
 		    exit 1
 		;;
-	    -n | --niconico )
-		    WEBSITE=niconico
-		;;
-	    -t | --twitch )
-		    WEBSITE=twitch
-		;;
-	    -y | --youtube )
-		    WEBSITE=ytb
-		;;
+	    -w | --website | --website=*? )
+	        if [[ "$1" =~ ^--website=* ]]; then 
+		    WEBSITE=$(echo $1 | sed -e 's/^--website=//')
+		elif [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
+	            echo "'website' requires an argument."
+                    exit 1
+		else
+		    WEBSITE=$2
+		    shift
+		fi
+	        ;;
 	    -p | --profile | --profile=*? )
 		if [[ "$1" =~ ^--profile= ]]; then
                     PRFNUM=$(echo $1 | sed -e 's/^--profile=//')
