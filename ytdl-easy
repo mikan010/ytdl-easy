@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Version
-VERSION=1.6.1
+VERSION=1.6.2
 
 #Settings
 MOVIE="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata -f bestvideo+bestaudio --throttled-rate 1M --limit-rate 64M -o"
@@ -68,7 +68,7 @@ Usage: cat hoge.txt | $(basename "$0") [OPTION]
 Version: $VERSION
 
 [Must software]
-  yt-dlp, ffmpeg, ffprobe
+  yt-dlp, ffmpeg, ffprobe, git
 
 
 [Download type]
