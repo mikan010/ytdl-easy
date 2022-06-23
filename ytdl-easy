@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Version
-VERSION=1.6.2
+VERSION=1.7.0
 
 #Settings
 MOVIE="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata -f bestvideo+bestaudio --throttled-rate 1M --limit-rate 64M -o"
@@ -35,6 +35,8 @@ Version: $VERSION
   -h, --help					Display usage.
 
   -H, --help-all				Display usage-all.
+
+  -i						Display the command before execution.
 
   -w WEBSITE, --website=WEBSITE			Select the name for download website.
 							(default): $WEBSITE
@@ -89,6 +91,8 @@ Version: $VERSION
   -h, --help                           		Display usage.
 
   -H, --help-all                       		Display usage-all.
+
+  -i						Display the command before execution.
 
   -w WEBSITE, --website=WEBSITE			Select the name for download website.
 							(default): $WEBSITE
@@ -163,6 +167,9 @@ do
 	    -H | --help-all )
 		    usage-all
 		    exit 1
+		;;
+	    -i )
+		SHOWCMD=1
 		;;
 	    -w | --website | --website=*? )
 	        if [[ "$1" =~ ^--website=* ]]; then 
@@ -274,10 +281,18 @@ cd "$DLDIR"
 
 
 # DL from argument
+if [[ -n "$ARG1" ]] && [[ -n "$SHOWCMD" ]]; then
+    echo $EXECCMD $ARG1
+    exit 1
+fi
 if [[ -n "$ARG1" ]]; then
     $EXECCMD $ARG1
     exit 1
 fi
 
 # DL from stdin
+if [[ -n "$SHOWCMD" ]]; then
+    cat | xargs -n 1 -IXXX echo $EXECCMD XXX
+    exit 1
+fi
 cat | xargs -n 1 -P $MAXTHREAD -IXXX $EXECCMD XXX
