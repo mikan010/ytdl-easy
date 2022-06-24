@@ -1,13 +1,18 @@
 #!/bin/bash
 
 #Version
-VERSION=1.7.0
+VERSION=1.8.0
 
 #Settings
-MOVIE="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata -f bestvideo+bestaudio --throttled-rate 1M --limit-rate 64M -o"
-AUDIO="yt-dlp -i --throttled-rate 1M -f bestaudio -x --audio-format"
-NICONICO_MOVIE="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --sub-lang live_chat -f best --throttled-rate 1M -o"
-TWITCH="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata --throttled-rate 1M --limit-rate 64M -o"
+#yt-dlp
+ytdlp_MV="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata -f bestvideo+bestaudio --throttled-rate 1M --limit-rate 64M"
+ytdlp_AD="yt-dlp -i --throttled-rate 1M -f bestaudio -x --audio-format"
+ytdlp_NICONICO="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --sub-lang live_chat -f best --throttled-rate 1M --limit-rate 64M"
+ytdlp_TWITCH="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata --throttled-rate 1M --limit-rate 64M"
+#ytarchive
+ytarchive="ytarchive --add-metadata -k --save -t -r 15 -trace -v --vp9 --write-description --write-thumbnail"
+
+USECMD=yt-dlp
 COOKIEDIR=$HOME"/Documents/cookies/"
 MAXTHREAD=5
 WEBSITE=ytb
@@ -23,6 +28,14 @@ Usage: cat hoge.txt | $(basename "$0") [OPTION]
 Version: $VERSION
 
 [OPTION]
+  -1, --yt-dlp					Use yt-dlp(default)_!!Insert this option at the beginning!!.
+
+  -2, --ytarchive				Use ytarchive(ytbLive(Stream)only)_!!Insert this option at the beginning!!.
+
+  -v4						Force IPv4.
+
+  -v6						Force IPv6.
+
   -a FORMAT, --audio=FORMAT			Specify this option when you want to download only the AUDIO.	
 							FORMAT: best, m4a, mp3
 							(default): best
@@ -69,16 +82,19 @@ Usage: cat hoge.txt | $(basename "$0") [OPTION]
 
 Version: $VERSION
 
-[Must software]
-  yt-dlp, ffmpeg, ffprobe, git
-
-
-[Download type]
-  MOVIE(default):                       $MOVIE
-  AUDIO:                                $AUDIO
+[Need software]
+  yt-dlp, ytarchive, ffmpeg, ffprobe, git
 
 
 [OPTION]
+  -1, --yt-dlp					Use yt-dlp(default)_!!Insert this option at the beginning!!.
+
+  -2, --ytarchive				Use ytarchive(ytbLive(Stream)only)_!!Insert this option at the beginning!!.
+
+  -v4						Force IPv4.
+
+  -v6						Force IPv6.
+
   -a FORMAT, --audio=FORMAT			Specify this option when you want to download only the AUDIO.
                                        			FORMAT: best, m4a, mp3
                                        			(default): best
@@ -128,15 +144,33 @@ fi
 while (( $# > 0 ))
 do
     case $1 in
+	   -1 | --yt-dlp )
+		USECMD=yt-dlp
+		;;
+	   -2 | --ytarchive )
+		USECMD=ytarchive
+		ytarcQL=best
+		;;
+	   -v4 )
+		IPv="-4"
+		;;
+	   -v6 )
+		IPv="-6"
+		;;
 	   -a | --audio | --audio=*? )
-	        if [[ "$1" =~ ^--audio=* ]]; then 
-		    AUDIOFMT=$(echo $1 | sed -e 's/^--audio=//')
-		elif [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
-		    AUDIOFMT=best
-		else
-		    AUDIOFMT=$2
-		    shift
-		fi
+		case "$USECMD" in
+			"yt-dlp" ) 
+			    if [[ "$1" =~ ^--audio=* ]]; then 
+		    		AUDIOFMT=$(echo $1 | sed -e 's/^--audio=//')
+			    elif [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
+		    		AUDIOFMT=best
+			    else
+		    		AUDIOFMT=$2
+		    		shift
+			    fi
+			;;
+			"ytarchive" ) ytarcQL=audio_only ;;
+		esac
 	        ;;
 	    -c | --cookie | --cookie=*? )
 	        if [[ "$1" =~ ^--cookie= ]]; then
@@ -258,21 +292,23 @@ case "$PRFNUM" in
 	;;
 esac
 
-# Config for Audio format.
-case "$AUDIOFMT" in
-	"best" ) DLFMT="best" ;;
-	"m4a" ) DLFMT="m4a" ;;
-	"mp3" ) DLFMT="mp3" ;;
-esac
 
 # Process when Audio only or Niconico was seletecte.
 if [[ -n "$AUDIOFMT" ]]; then
-    EXECCMD="$AUDIO $DLFMT -o $PRF $USECOOKIE"
+    case "$USECMD" in
+	"yt-dlp" ) EXECCMD="$ytdlp_AD $AUDIOFMT $IPv -o $PRF $USECOOKIE" ;;
+	"ytarchive" ) EXECCMD="$ytarchive $IPv -o $PRF $USECOOKIE ";;
+    esac
 else
-    case "$WEBSITE" in
-	"ytb" ) EXECCMD="$MOVIE $PRF $USECOOKIE" ;;
-	"twitch" ) EXECCMD="$TWITCH $PRF" ;;
-	"niconico" ) EXECCMD="$NICONICO_MOVIE $PRF $USER $PASS" ;;
+    case "$USECMD" in
+	"yt-dlp" )
+    	    case "$WEBSITE" in
+	    	"ytb" ) EXECCMD="$ytdlp_MV $IPv -o $PRF $USECOOKIE" ;;
+	    	"twitch" ) EXECCMD="$ytdlp_TWITCH $IPv -o $PRF" ;;
+	    	"niconico" ) EXECCMD="$ytdlp_NICONICO $IPv -o $PRF $USER $PASS" ;;
+            esac
+	;;
+	"ytarchive" ) EXECCMD="$ytarchive $IPv -o $PRF $USECOOKIE";;
     esac
 fi
 
@@ -282,17 +318,17 @@ cd "$DLDIR"
 
 # DL from argument
 if [[ -n "$ARG1" ]] && [[ -n "$SHOWCMD" ]]; then
-    echo $EXECCMD $ARG1
+    echo $EXECCMD $ARG1 $ytarcQL
     exit 1
 fi
 if [[ -n "$ARG1" ]]; then
-    $EXECCMD $ARG1
+    $EXECCMD $ARG1 $ytarcQL
     exit 1
 fi
 
 # DL from stdin
 if [[ -n "$SHOWCMD" ]]; then
-    cat | xargs -n 1 -IXXX echo $EXECCMD XXX
+    cat | xargs -n 1 -IXXX echo $EXECCMD XXX $ytarcQL
     exit 1
 fi
-cat | xargs -n 1 -P $MAXTHREAD -IXXX $EXECCMD XXX
+cat | xargs -n 1 -P $MAXTHREAD -IXXX $EXECCMD XXX $ytarcQL
