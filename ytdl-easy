@@ -291,7 +291,14 @@ case "$PRFNUM" in
 	    exit 1
 	;;
 esac
-
+if [[ "$USECMD" = ytarchive ]]; then
+    case "$PRFNUM" in
+        "3" ) PRF='%(upload_date)s-%(title)s/%(title)s_[%(id)s]' ;;
+	"4" ) PRF='%(upload_date)s-%(title)s-%(channel)s_[%(channel_id)s]/%(title)s_[%(id)s]' ;;
+	"6" ) PRF='%(channel)s_[%(channel_id)s]/%(upload_date)s-%(title)s/%(title)s_[%(id)s]' ;;
+	"7" ) PRF='%(upload_date)s-[%(id)s]/%(title)s' ;;
+    esac
+fi
 
 # Process when Audio only or Niconico was seletecte.
 if [[ -n "$AUDIOFMT" ]]; then
