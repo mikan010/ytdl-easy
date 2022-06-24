@@ -279,13 +279,13 @@ done
 
 # Config for Profile num.
 case "$PRFNUM" in
-	"1" ) PRF='%(title)s_[%(id)s].%(ext)s' ;;
-	"2" ) PRF='%(title)s.%(ext)s' ;;
-        "3" ) PRF='%(release_date,upload_date|Unknown)s-%(title)s/%(title)s_[%(id)s].%(ext)s' ;;
-	"4" ) PRF='%(release_date,upload_date|Unknown)s-%(title)s-%(channel)s_[%(channel_id)s]/%(title)s_[%(id)s].%(ext)s' ;;
-        "5" ) PRF='%(title)s-%(channel)s_[%(channel_id)s]/%(title)s_[%(id)s].%(ext)s' ;;
-	"6" ) PRF='%(channel)s_[%(channel_id)s]/%(release_date,upload_date|Unknown)s-%(title)s/%(title)s_[%(id)s].%(ext)s' ;;
-	"7" ) PRF='%(release_date,upload_date|Unknown)s-[%(id)s]/%(title)s.%(ext)s' ;;
+	"1" ) PRF='%(title)s_[%(id)s]' ;;
+	"2" ) PRF='%(title)s' ;;
+        "3" ) PRF='%(release_date,upload_date|Unknown)s-%(title)s/%(title)s_[%(id)s]' ;;
+	"4" ) PRF='%(release_date,upload_date|Unknown)s-%(title)s-%(channel)s_[%(channel_id)s]/%(title)s_[%(id)s]' ;;
+        "5" ) PRF='%(title)s-%(channel)s_[%(channel_id)s]/%(title)s_[%(id)s]' ;;
+	"6" ) PRF='%(channel)s_[%(channel_id)s]/%(release_date,upload_date|Unknown)s-%(title)s/%(title)s_[%(id)s]' ;;
+	"7" ) PRF='%(release_date,upload_date|Unknown)s-[%(id)s]/%(title)s' ;;
 	* )
 	    echo $PRFNUM "is not supported Profile number (option: -p,--profile)."
 	    exit 1
