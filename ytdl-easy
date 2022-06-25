@@ -1,9 +1,15 @@
 #!/bin/bash
 
 #Version
-VERSION=1.8.2
+VERSION=1.8.3
 
 #Settings
+USECMD=yt-dlp
+COOKIEDIR=$HOME"/Documents/cookies/"
+MAXTHREAD=5
+WEBSITE=ytb
+PRFNUM=1
+
 #yt-dlp
 ytdlp_MV="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata -f bestvideo+bestaudio --throttled-rate 1M --limit-rate 64M"
 ytdlp_AD="yt-dlp -i --throttled-rate 1M -f bestaudio -x --audio-format"
@@ -12,11 +18,6 @@ ytdlp_TWITCH="yt-dlp -i --write-thumbnail --write-description --write-info-json 
 #ytarchive
 ytarchive="ytarchive --add-metadata -k --save -t -r 15 -trace -v --vp9 --write-description --write-thumbnail"
 
-USECMD=yt-dlp
-COOKIEDIR=$HOME"/Documents/cookies/"
-MAXTHREAD=5
-WEBSITE=ytb
-PRFNUM=1
 
 
 #Help display
@@ -26,6 +27,9 @@ Usage: $(basename "$0") [OPTION] URL
 Usage: cat hoge.txt | $(basename "$0") [OPTION]
 
 Version: $VERSION
+
+[Need software]
+    yt-dlp, ytarchive. ffmpeg, ffprobe, git
 
 [OPTION]
   -1, --yt-dlp					Use yt-dlp(default)_!!Insert this option at the beginning!!.
@@ -46,8 +50,6 @@ Version: $VERSION
   -d DIR, --dir=DIR				Directory for download.
 
   -h, --help					Display usage.
-
-  -H, --help-all				Display usage-all.
 
   -i						Display the command before execution.
 
@@ -74,67 +76,8 @@ Version: $VERSION
 EOM
 }
 
-#Help-all display
-function usage-all {
-        cat <<EOM
-Usage: $(basename "$0") [OPTION] URL
-Usage: cat hoge.txt | $(basename "$0") [OPTION]
 
-Version: $VERSION
-
-[Need software]
-  yt-dlp, ytarchive, ffmpeg, ffprobe, git
-
-
-[OPTION]
-  -1, --yt-dlp					Use yt-dlp(default)_!!Insert this option at the beginning!!.
-
-  -2, --ytarchive				Use ytarchive(ytbLive(Stream)only)_!!Insert this option at the beginning!!.
-
-  -v4						Force IPv4.
-
-  -v6						Force IPv6.
-
-  -a FORMAT, --audio=FORMAT			Specify this option when you want to download only the AUDIO.
-                                       			FORMAT: best, m4a, mp3
-                                       			(default): best
-                                       			m4a, mp3 are conveted from best.
-
-  -c COOKIE, --cookie=COOKIE           		The name of the cookie to use(for YouTube).
-
-  -d DIR, --dir=DIR                     	Directory for download.
-
-  -h, --help                           		Display usage.
-
-  -H, --help-all                       		Display usage-all.
-
-  -i						Display the command before execution.
-
-  -w WEBSITE, --website=WEBSITE			Select the name for download website.
-							(default): $WEBSITE
-							ytb(YouTube), twitch, niconico
-
-  -p PROFILE, --profile=PROFILE         	Select the name format used when saving the video.
-                                        		(default): $PRFNUM
-                                        		1: title_[ID].ext
-                                        		2: title.ext
-                                        		3: date-title / title_[ID].ext
-                                        		4: date-title-channel_[channelID] / title_[ID].ext
-                                        		5: title-channel_[channelID] / title_[ID].ext
-                                        		6: channel_[channelID] / date-title / title_[ID].ext
-							7: date-[ID] / title.ext
-
-  -U, --upgrade                         	Upgrade this program(Requires "root").
-
-  --user=USER					Username or Mail(for NicoVideo).
-
-  --pass=PASSWORD				Password(for NicoVideo).
-
-EOM
-}
-
-
-# Display "usage" when did not enter any arguments.
+# When did not enter any arguments.
 if [ $# = 0 ]; then
     usage
     exit 1
@@ -196,10 +139,6 @@ do
 		;;
 	    -h | --help )
 		    usage
-		    exit 1
-		;;
-	    -H | --help-all )
-		    usage-all
 		    exit 1
 		;;
 	    -i )
@@ -277,7 +216,8 @@ do
     shift
 done
 
-# Config for Profile num.
+
+# Confirm the file name.
 case "$PRFNUM" in
 	"1" ) PRF='%(title)s_[%(id)s]' ;;
 	"2" ) PRF='%(title)s' ;;
@@ -300,7 +240,7 @@ if [[ "$USECMD" = ytarchive ]]; then
     esac
 fi
 
-# Process when Audio only or Niconico was seletecte.
+# Create commands.
 if [[ -n "$AUDIOFMT" ]]; then
     case "$USECMD" in
 	"yt-dlp" ) EXECCMD="$ytdlp_AD $AUDIOFMT $IPv -o $PRF $USECOOKIE" ;;
@@ -324,18 +264,21 @@ cd "$DLDIR"
 
 
 # DL from argument
-if [[ -n "$ARG1" ]] && [[ -n "$SHOWCMD" ]]; then
-    echo $EXECCMD $ARG1 $ytarcQL
-    exit 1
-fi
 if [[ -n "$ARG1" ]]; then
-    $EXECCMD $ARG1 $ytarcQL
-    exit 1
+    if [[ -n "$SHOWCMD" ]]; then
+	echo $EXECCMD $ARG1 $ytarcQL
+	exit 1
+    else
+	$EXECCMD $ARG1 $ytarcQL
+	exit 1
+    fi
 fi
 
 # DL from stdin
 if [[ -n "$SHOWCMD" ]]; then
     cat | xargs -n 1 -IXXX echo $EXECCMD XXX $ytarcQL
     exit 1
+else
+    cat | xargs -n 1 -P $MAXTHREAD -IXXX $EXECCMD XXX $ytarcQL
+    exit 1
 fi
-cat | xargs -n 1 -P $MAXTHREAD -IXXX $EXECCMD XXX $ytarcQL
