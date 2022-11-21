@@ -2,7 +2,7 @@
 
 
 #Version
-VERSION=1.8.4
+VERSION=1.8.5
 
 #Settings
 USECMD=yt-dlp
@@ -24,6 +24,7 @@ ytarchive="ytarchive --add-metadata -k --save -t -r 15 -trace -v --vp9 --write-d
 #Help display
 function usage {
 	cat <<EOM
+
 Usage: $(basename "$0") [OPTION] URL
 Usage: cat hoge.txt | $(basename "$0") [OPTION]
 
@@ -221,14 +222,14 @@ done
 
 # Confirm the file name.
 case "$PRFNUM" in
-	"1" ) PRF='%(title)s_[%(id)s]' ;;
-	"2" ) PRF='%(title)s' ;;
-        "3" ) PRF='%(release_date,upload_date|Unknown)s-%(title)s/%(title)s_[%(id)s]' ;;
-	"4" ) PRF='%(release_date,upload_date|Unknown)s-%(title)s-%(channel)s_[%(channel_id)s]/%(title)s_[%(id)s]' ;;
-        "5" ) PRF='%(title)s-%(channel)s_[%(channel_id)s]/%(title)s_[%(id)s]' ;;
-	"6" ) PRF='%(channel)s_[%(channel_id)s]/%(release_date,upload_date|Unknown)s-%(title)s/%(title)s_[%(id)s]' ;;
-	"7" ) PRF='%(release_date,upload_date|Unknown)s-[%(id)s]/%(title)s' ;;
-	"8" ) PRF='%(release_date,upload_date|Unknown)s/%(title)s/%(id)s' ;;
+	"1" ) PRF='%(title)s_[%(id)s].%(ext)s' ;;
+	"2" ) PRF='%(title)s.%(ext)s' ;;
+        "3" ) PRF='%(release_date,upload_date|Unknown)s-%(title)s/%(title)s_[%(id)s].%(ext)s' ;;
+	"4" ) PRF='%(release_date,upload_date|Unknown)s-%(title)s-%(channel)s_[%(channel_id)s]/%(title)s_[%(id)s].%(ext)s' ;;
+        "5" ) PRF='%(title)s-%(channel)s_[%(channel_id)s]/%(title)s_[%(id)s].%(ext)s' ;;
+	"6" ) PRF='%(channel)s_[%(channel_id)s]/%(release_date,upload_date|Unknown)s-%(title)s/%(title)s_[%(id)s].%(ext)s' ;;
+	"7" ) PRF='%(release_date,upload_date|Unknown)s-[%(id)s]/%(title)s.%(ext)s' ;;
+	"8" ) PRF='%(release_date,upload_date|Unknown)s/%(title)s/%(id)s.%(ext)s' ;;
 	* )
 	    echo $PRFNUM "is not supported Profile number (option: -p,--profile)."
 	    exit 1
