@@ -9,7 +9,8 @@ USECMD=yt-dlp
 COOKIEDIR=$HOME"/Documents/cookies/"
 MAXTHREAD=5
 WEBSITE=ytb
-PRFNUM=1
+PRFNUM=3
+IPv="-6"
 
 #yt-dlp
 ytdlp_MV="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata -f bestvideo+bestaudio --throttled-rate 1M --limit-rate 64M"
@@ -40,8 +41,8 @@ Version: $VERSION
   -2, --ytarchive				Use ytarchive(ytbLive(Stream)only)_!!Insert this option at the beginning!!.
 
   -v4						Force IPv4.
-
   -v6						Force IPv6.
+						(default): $IPv
 
   -a FORMAT, --audio=FORMAT			Specify this option when you want to download only the AUDIO.	
 							FORMAT: best, m4a, mp3
