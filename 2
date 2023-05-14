@@ -2,7 +2,7 @@
 
 
 #Version
-VERSION=1.9.3
+VERSION=1.9.0
 
 #Settings
 USECMD=yt-dlp
@@ -10,11 +10,9 @@ COOKIEDIR=$HOME"/Documents/cookies/"
 MAXTHREAD=5
 WEBSITE=ytb
 PRFNUM=3
-IPv="-6"
 
 #yt-dlp
-ytdlp_MV="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata -f bestvideo+bestaudio --limit-rate 64M"
-# ytdlp_MV="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata -f bestvideo+bestaudio --throttled-rate 1M --limit-rate 64M"
+ytdlp_MV="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata -f bestvideo+bestaudio --throttled-rate 1M --limit-rate 64M"
 ytdlp_AD="yt-dlp -i --throttled-rate 1M -f bestaudio -x --audio-format"
 ytdlp_NICONICO="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --sub-lang live_chat -f best --throttled-rate 1M --limit-rate 64M"
 ytdlp_TWITCH="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata --throttled-rate 1M --limit-rate 64M"
@@ -42,8 +40,8 @@ Version: $VERSION
   -2, --ytarchive				Use ytarchive(ytbLive(Stream)only)_!!Insert this option at the beginning!!.
 
   -v4						Force IPv4.
+
   -v6						Force IPv6.
-						(default): $IPv
 
   -a FORMAT, --audio=FORMAT			Specify this option when you want to download only the AUDIO.	
 							FORMAT: best, m4a, mp3
@@ -282,13 +280,13 @@ if [[ -n "$ARG1" ]]; then
 	$EXECCMD $ARG1 $ytarcQL
 	exit 1
     fi
+fi
+
 # DL from stdin
+if [[ -n "$SHOWCMD" ]]; then
+    cat | xargs -n 1 -IXXX echo $EXECCMD XXX $ytarcQL
+    exit 1
 else
-	if [[ -n "$SHOWCMD" ]]; then
-	    cat | xargs -n 1 -IXXX echo $EXECCMD XXX $ytarcQL
-	    exit 1
-	else
-	    cat | xargs -n 1 -P $MAXTHREAD -IXXX $EXECCMD XXX $ytarcQL
-	    exit 1
-	fi
+    cat | xargs -n 1 -P $MAXTHREAD -IXXX $EXECCMD XXX $ytarcQL
+    exit 1
 fi
