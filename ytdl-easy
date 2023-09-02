@@ -2,7 +2,7 @@
 
 
 #Version
-VERSION=1.9.3
+VERSION=1.9.4
 
 #Settings
 USECMD=yt-dlp
@@ -73,6 +73,7 @@ Version: $VERSION
 							6: channel_[channelID] / date-title / title_[ID].ext
 							7: date-[ID] / title.ext
 							8: date / title / ID.ext
+							9: date / ID.ext
 
   -U, --upgrade					Upgrade this program(Requires "root").
 
@@ -246,6 +247,7 @@ if [[ "$USECMD" = ytarchive ]]; then
 	"6" ) PRF='%(channel)s_[%(channel_id)s]/%(upload_date)s-%(title)s/%(title)s_[%(id)s]' ;;
 	"7" ) PRF='%(upload_date)s-[%(id)s]/%(title)s' ;;
 	"8" ) PRF='%(upload_date)/%(title)s/%(id)s' ;;
+	"9" ) PRF='%(upload_date)/%(id)s' ;;
     esac
 fi
 
