@@ -235,6 +235,7 @@ case "$PRFNUM" in
 	"6" ) PRF='%(channel)s_[%(channel_id)s]/%(release_date,upload_date|Unknown)s-%(title)s/%(title)s_[%(id)s].%(ext)s' ;;
 	"7" ) PRF='%(release_date,upload_date|Unknown)s-[%(id)s]/%(title)s.%(ext)s' ;;
 	"8" ) PRF='%(release_date,upload_date|Unknown)s/%(title)s/%(id)s.%(ext)s' ;;
+	"9" ) PRF='%(release_date,upload_date|Unknown)s/%(id)s.%(ext)s' ;;
 	* )
 	    echo $PRFNUM "is not supported Profile number (option: -p,--profile)."
 	    exit 1
