@@ -2,7 +2,7 @@
 
 
 #Version
-VERSION=1.9.5
+VERSION=1.10.1
 
 #Settings
 USECMD=yt-dlp
@@ -34,36 +34,48 @@ Usage: cat hoge.txt | $(basename "$0") [OPTION]
 Version: $VERSION
 
 [Need software]
-    yt-dlp, ytarchive, ffmpeg, ffprobe, git
+    yt-dlp, ytarchive, git, screen
+
+	yt-dlp:					https://github.com/yt-dlp/yt-dlp
+	ytarchive:				https://github.com/Kethsar/ytarchive
 
 [OPTION]
-  -1, --yt-dlp					Use yt-dlp(default)_!!Insert this option at the beginning!!.
+  -1, --yt-dlp				Use yt-dlp(default)_!!Insert this option at the beginning!!.
 
-  -2, --ytarchive				Use ytarchive(ytbLive(Stream)only)_!!Insert this option at the beginning!!.
+  -2, --ytarchive			Use ytarchive(ytbLive(Stream)only)_!!Insert this option at the beginning!!.
 
   -v4						Force IPv4.
   -v6						Force IPv6.
-						(default): $IPv
+							(default): $IPv
 
-  -a FORMAT, --audio=FORMAT			Specify this option when you want to download only the AUDIO.	
+  -a FORMAT,
+  --audio=FORMAT			Specify this option when you want to download only the AUDIO.	
 							FORMAT: best, m4a, mp3
 							(default): best
 							m4a, mp3 are conveted from best.
 
-  -c COOKIE, --cookie=COOKIE			The name of the cookie to use(for YouTube).
+  -c COOKIE,
+  --cookie=COOKIE			The name of the cookie to use(for YouTube).
 
-  -d DIR, --dir=DIR				Directory for download.
+  -d DIR, --dir=DIR			Directory for download.
 
-  -h, --help					Display usage.
+  -h, --help				Display usage.
 
   -i						Display the command before execution.
 
-  -w WEBSITE, --website=WEBSITE			Select the name for download website.
+  -L, --loop				Loop execution of the command with the same options.
+
+  -S SESSIONNAME,
+  --screen=SESSIONNAME		Execute the command in a screen session.
+
+  -w WEBSITE,
+  --website=WEBSITE			Select the name for download website.
 							(default): $WEBSITE
 							ytb(YouTube), twitch, niconico, twicas
-						!! "twicas" is only download recorded data. !!
+							!! "twicas" is only download recorded data. !!
 
-  -p PROFILE, --profile=PROFILE			Select the name format used when saving the video.
+  -p PROFILE,
+  --profile=PROFILE			Select the name format used when saving the video.
 							(default): $PRFNUM
 							1: title_[ID].ext
 							2: title.ext
@@ -75,11 +87,11 @@ Version: $VERSION
 							8: date-[ID] / title / ID.ext
 							9: date-[ID] / ID.ext
 
-  -U, --upgrade					Upgrade this program(Requires "root").
+  -U, --upgrade				Upgrade this program(Requires "root").
 
-  --user=USER					Username or Mail(for NicoVideo).
+  --user=USER				Username or Mail(for NicoVideo).
 
-  --pass=PASSWORD				Password(for NicoVideo).
+  --pass=PASSWORD			Password(for NicoVideo).
 
 EOM
 }
@@ -163,6 +175,12 @@ do
 		    shift
 		fi
 	        ;;
+
+#	    -L | --loop )
+
+#		-S | --screen | --screen=*? )
+
+
 	    -p | --profile | --profile=*? )
 		if [[ "$1" =~ ^--profile= ]]; then
                     PRFNUM=$(echo $1 | sed -e 's/^--profile=//')
