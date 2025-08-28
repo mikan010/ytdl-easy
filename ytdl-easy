@@ -2,7 +2,7 @@
 
 
 #Version
-VERSION=1.10.2
+VERSION=1.11.0
 
 #Settings
 USECMD=yt-dlp
@@ -15,7 +15,7 @@ IPv="-6"
 #yt-dlp
 ytdlp_MV="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata --limit-rate 64M"
 # ytdlp_MV="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata -f bestvideo+bestaudio --throttled-rate 1M --limit-rate 64M"
-ytdlp_FORMAT="bestvideo+bestaudio"
+ytdlp_FORMAT="-f bestvideo+bestaudio"
 ytdlp_AD="yt-dlp -i --throttled-rate 1M -f bestaudio -x --audio-format"
 ytdlp_NICONICO="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --sub-lang live_chat -f best --throttled-rate 1M --limit-rate 64M"
 ytdlp_TWITCH="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata --throttled-rate 1M --limit-rate 64M"
@@ -174,7 +174,7 @@ do
 		;;
 	    -h | --help )
 		    usage
-		    exit 1
+		    exit 0
 		;;
 	    -i )
 		SHOWCMD=1
@@ -214,7 +214,7 @@ do
 		echo "Complete."
 		exit 1
 		;;
-	    --user | --user= )
+	    --user | --user=*? )
 		if [[ "$1" =~ ^--user= ]]; then
                     USER="-u "$(echo $1 | sed -e 's/^--user=//')
                 elif [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
@@ -225,11 +225,11 @@ do
                     shift
                 fi
 		;;
-	    --pass | --pass= )
+	    --pass | --pass=*? )
 		if [[ "$1" =~ ^--pass= ]]; then
                     PASS="-p "$(echo $1 | sed -e 's/^--pass=//')
                 elif [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
-                    echo "'user' requires an argument."
+                    echo "'pass' requires an argument."
                     exit 1
                 else
                     PASS="-p "$2
@@ -243,14 +243,14 @@ do
 		exit 1
 		;;
 	    * )
-	        if [[ -n "$ARG1" ]]; then
+	        if [[ -n "$input_URL" ]]; then
 		    echo "Too many arguments."
 		    exit 1
 		elif [[ "$1" != http* ]]; then
 		    echo "$1" "is not URL."
 		    exit 1
 		else
-		    ARG1="$1"
+		    input_URL="$1"
 		fi
 		;;
     esac
@@ -304,27 +304,52 @@ else
 	"ytarchive" ) EXECCMD="$ytarchive $IPv -o $PRF $USECOOKIE";;
     esac
 fi
+if [[ $WEBSITE != "ytb" ]]; then
+	ytdlp_FORMAT="";
+fi
 
 # Change directory for DL
-cd "$DLDIR"
+cd "${DLDIR:=.}"
 
 
 # DL from argument
-if [[ -n "$ARG1" ]]; then
+if [[ -n "$input_URL" ]]; then
     if [[ -n "$SHOWCMD" ]]; then
-	echo $EXECCMD $ARG1 $ytarcQL
+	echo $EXECCMD $input_URL $ytarcQL
 	exit 1
     else
-	$EXECCMD $ARG1 $ytarcQL
+	$EXECCMD $input_URL $ytarcQL
 	exit 1
     fi
 # DL from stdin
 else
-	if [[ -n "$SHOWCMD" ]]; then
-	    cat | xargs -n 1 -IXXX echo $EXECCMD XXX $ytarcQL
-	    exit 1
-	else
-	    cat | xargs -n 1 -P $MAXTHREAD -IXXX $EXECCMD XXX $ytarcQL
-	    exit 1
-	fi
+	job_count=0
+	while IFS= read -r line || [[ -n "${line:-}" ]]; do
+		[[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+
+		read -r -a fields <<<"$line"
+
+		args_length=${#fields[@]}
+		if [[ "$args_length" -gt 2 ]]; then
+			echo "Too many arguments."
+			exit 1
+		elif [[ "$args_length" -lt 1 ]]; then
+			echo "Too few arguments."
+			exit 1
+		fi
+		stdin_url=${fields[0]}
+		stdin_ytdlp_format=${fields[1]}
+
+		if [[ -n "$SHOWCMD" ]]; then
+			echo $EXECCMD $stdin_ytdlp_format $stdin_url $ytarcQL
+		else
+			$EXECCMD $stdin_ytdlp_format $stdin_url $ytarcQL &
+			((job_count++))
+			if [[ "$job_count" -ge "$MAXTHREAD" ]]; then
+				wait -n
+				((job_count--))
+			fi
+		fi
+	done
+	wait
 fi
