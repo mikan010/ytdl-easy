@@ -2,7 +2,7 @@
 
 
 #Version
-VERSION=1.10.1
+VERSION=1.10.2
 
 #Settings
 USECMD=yt-dlp
@@ -13,8 +13,9 @@ PRFNUM=3
 IPv="-6"
 
 #yt-dlp
-ytdlp_MV="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata -f bestvideo+bestaudio --limit-rate 64M"
+ytdlp_MV="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata --limit-rate 64M"
 # ytdlp_MV="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata -f bestvideo+bestaudio --throttled-rate 1M --limit-rate 64M"
+ytdlp_FORMAT="bestvideo+bestaudio"
 ytdlp_AD="yt-dlp -i --throttled-rate 1M -f bestaudio -x --audio-format"
 ytdlp_NICONICO="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --sub-lang live_chat -f best --throttled-rate 1M --limit-rate 64M"
 ytdlp_TWITCH="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata --throttled-rate 1M --limit-rate 64M"
@@ -58,6 +59,9 @@ Version: $VERSION
   --cookie=COOKIE			The name of the cookie to use(for YouTube).
 
   -d DIR, --dir=DIR			Directory for download.
+
+  -f, --format=DL-FORMAT		Select Download format.
+					(default); $ytdlp_FORMAT
 
   -h, --help				Display usage.
 
@@ -154,6 +158,17 @@ do
 		    exit 1
 		else
 		    DLDIR=$2
+		    shift
+		fi
+		;;
+	    -f | --format | --format=*? )
+	        if [[ "$1" =~ ^--format= ]]; then
+		    ytdlp_FORMAT="-f "$(echo $1 | sed -e 's/^--format=//')
+		elif [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
+		    echo "'format' requires an argument."
+		    exit 1
+		else
+		    ytdlp_FORMAT="-f "$2
 		    shift
 		fi
 		;;
@@ -280,7 +295,7 @@ else
     case "$USECMD" in
 	"yt-dlp" )
     	    case "$WEBSITE" in
-	    	"ytb" ) EXECCMD="$ytdlp_MV $IPv -o $PRF $USECOOKIE" ;;
+	    	"ytb" ) EXECCMD="$ytdlp_MV $ytdlp_FORMAT $IPv -o $PRF $USECOOKIE" ;;
 	    	"twitch" ) EXECCMD="$ytdlp_TWITCH $IPv -o $PRF" ;;
 	    	"niconico" ) EXECCMD="$ytdlp_NICONICO $IPv -o $PRF $USER $PASS" ;;
 		"twicas" ) EXECCMD="$ytdlp_TWICAS -o $PRF" ;;
