@@ -2,7 +2,7 @@
 
 
 #Version
-VERSION=1.10.2
+VERSION=1.9.0
 
 #Settings
 USECMD=yt-dlp
@@ -10,12 +10,9 @@ COOKIEDIR=$HOME"/Documents/cookies/"
 MAXTHREAD=5
 WEBSITE=ytb
 PRFNUM=3
-IPv="-6"
 
 #yt-dlp
-ytdlp_MV="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata --limit-rate 64M"
-# ytdlp_MV="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata -f bestvideo+bestaudio --throttled-rate 1M --limit-rate 64M"
-ytdlp_FORMAT="bestvideo+bestaudio"
+ytdlp_MV="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata -f bestvideo+bestaudio --throttled-rate 1M --limit-rate 64M"
 ytdlp_AD="yt-dlp -i --throttled-rate 1M -f bestaudio -x --audio-format"
 ytdlp_NICONICO="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --sub-lang live_chat -f best --throttled-rate 1M --limit-rate 64M"
 ytdlp_TWITCH="yt-dlp -i --write-thumbnail --write-description --write-info-json --write-playlist-metafiles --write-comments --write-sub --all-subs --write-annotations --add-metadata --throttled-rate 1M --limit-rate 64M"
@@ -35,51 +32,36 @@ Usage: cat hoge.txt | $(basename "$0") [OPTION]
 Version: $VERSION
 
 [Need software]
-    yt-dlp, ytarchive, git, screen
-
-	yt-dlp:					https://github.com/yt-dlp/yt-dlp
-	ytarchive:				https://github.com/Kethsar/ytarchive
+    yt-dlp, ytarchive, ffmpeg, ffprobe, git
 
 [OPTION]
-  -1, --yt-dlp				Use yt-dlp(default)_!!Insert this option at the beginning!!.
+  -1, --yt-dlp					Use yt-dlp(default)_!!Insert this option at the beginning!!.
 
-  -2, --ytarchive			Use ytarchive(ytbLive(Stream)only)_!!Insert this option at the beginning!!.
+  -2, --ytarchive				Use ytarchive(ytbLive(Stream)only)_!!Insert this option at the beginning!!.
 
   -v4						Force IPv4.
-  -v6						Force IPv6.
-							(default): $IPv
 
-  -a FORMAT,
-  --audio=FORMAT			Specify this option when you want to download only the AUDIO.	
+  -v6						Force IPv6.
+
+  -a FORMAT, --audio=FORMAT			Specify this option when you want to download only the AUDIO.	
 							FORMAT: best, m4a, mp3
 							(default): best
 							m4a, mp3 are conveted from best.
 
-  -c COOKIE,
-  --cookie=COOKIE			The name of the cookie to use(for YouTube).
+  -c COOKIE, --cookie=COOKIE			The name of the cookie to use(for YouTube).
 
-  -d DIR, --dir=DIR			Directory for download.
+  -d DIR, --dir=DIR				Directory for download.
 
-  -f, --format=DL-FORMAT		Select Download format.
-					(default); $ytdlp_FORMAT
-
-  -h, --help				Display usage.
+  -h, --help					Display usage.
 
   -i						Display the command before execution.
 
-  -L, --loop				Loop execution of the command with the same options.
-
-  -S SESSIONNAME,
-  --screen=SESSIONNAME		Execute the command in a screen session.
-
-  -w WEBSITE,
-  --website=WEBSITE			Select the name for download website.
+  -w WEBSITE, --website=WEBSITE			Select the name for download website.
 							(default): $WEBSITE
 							ytb(YouTube), twitch, niconico, twicas
-							!! "twicas" is only download recorded data. !!
+						!! "twicas" is only download recorded data. !!
 
-  -p PROFILE,
-  --profile=PROFILE			Select the name format used when saving the video.
+  -p PROFILE, --profile=PROFILE			Select the name format used when saving the video.
 							(default): $PRFNUM
 							1: title_[ID].ext
 							2: title.ext
@@ -88,14 +70,13 @@ Version: $VERSION
 							5: title-channel_[channelID] / title_[ID].ext
 							6: channel_[channelID] / date-title / title_[ID].ext
 							7: date-[ID] / title.ext
-							8: date-[ID] / title / ID.ext
-							9: date-[ID] / ID.ext
+							8: date / title / ID.ext
 
-  -U, --upgrade				Upgrade this program(Requires "root").
+  -U, --upgrade					Upgrade this program(Requires "root").
 
-  --user=USER				Username or Mail(for NicoVideo).
+  --user=USER					Username or Mail(for NicoVideo).
 
-  --pass=PASSWORD			Password(for NicoVideo).
+  --pass=PASSWORD				Password(for NicoVideo).
 
 EOM
 }
@@ -161,17 +142,6 @@ do
 		    shift
 		fi
 		;;
-	    -f | --format | --format=*? )
-	        if [[ "$1" =~ ^--format= ]]; then
-		    ytdlp_FORMAT="-f "$(echo $1 | sed -e 's/^--format=//')
-		elif [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
-		    echo "'format' requires an argument."
-		    exit 1
-		else
-		    ytdlp_FORMAT="-f "$2
-		    shift
-		fi
-		;;
 	    -h | --help )
 		    usage
 		    exit 1
@@ -190,12 +160,6 @@ do
 		    shift
 		fi
 	        ;;
-
-#	    -L | --loop )
-
-#		-S | --screen | --screen=*? )
-
-
 	    -p | --profile | --profile=*? )
 		if [[ "$1" =~ ^--profile= ]]; then
                     PRFNUM=$(echo $1 | sed -e 's/^--profile=//')
@@ -267,8 +231,7 @@ case "$PRFNUM" in
         "5" ) PRF='%(title)s-%(channel)s_[%(channel_id)s]/%(title)s_[%(id)s].%(ext)s' ;;
 	"6" ) PRF='%(channel)s_[%(channel_id)s]/%(release_date,upload_date|Unknown)s-%(title)s/%(title)s_[%(id)s].%(ext)s' ;;
 	"7" ) PRF='%(release_date,upload_date|Unknown)s-[%(id)s]/%(title)s.%(ext)s' ;;
-	"8" ) PRF='%(release_date,upload_date|Unknown)s-[%(id)s]/%(title)s/%(id)s.%(ext)s' ;;
-	"9" ) PRF='%(release_date,upload_date|Unknown)s-[%(id)s]/%(id)s.%(ext)s' ;;
+	"8" ) PRF='%(release_date,upload_date|Unknown)s/%(title)s/%(id)s.%(ext)s' ;;
 	* )
 	    echo $PRFNUM "is not supported Profile number (option: -p,--profile)."
 	    exit 1
@@ -280,8 +243,7 @@ if [[ "$USECMD" = ytarchive ]]; then
 	"4" ) PRF='%(upload_date)s-%(title)s-%(channel)s_[%(channel_id)s]/%(title)s_[%(id)s]' ;;
 	"6" ) PRF='%(channel)s_[%(channel_id)s]/%(upload_date)s-%(title)s/%(title)s_[%(id)s]' ;;
 	"7" ) PRF='%(upload_date)s-[%(id)s]/%(title)s' ;;
-	"8" ) PRF='%(upload_date)s-[%(id)s]/%(title)s/%(id)s' ;;
-	"9" ) PRF='%(upload_date)s-[%(id)s]/%(id)s' ;;
+	"8" ) PRF='%(upload_date)/%(title)s/%(id)s' ;;
     esac
 fi
 
@@ -295,7 +257,7 @@ else
     case "$USECMD" in
 	"yt-dlp" )
     	    case "$WEBSITE" in
-	    	"ytb" ) EXECCMD="$ytdlp_MV $ytdlp_FORMAT $IPv -o $PRF $USECOOKIE" ;;
+	    	"ytb" ) EXECCMD="$ytdlp_MV $IPv -o $PRF $USECOOKIE" ;;
 	    	"twitch" ) EXECCMD="$ytdlp_TWITCH $IPv -o $PRF" ;;
 	    	"niconico" ) EXECCMD="$ytdlp_NICONICO $IPv -o $PRF $USER $PASS" ;;
 		"twicas" ) EXECCMD="$ytdlp_TWICAS -o $PRF" ;;
@@ -318,13 +280,13 @@ if [[ -n "$ARG1" ]]; then
 	$EXECCMD $ARG1 $ytarcQL
 	exit 1
     fi
+fi
+
 # DL from stdin
+if [[ -n "$SHOWCMD" ]]; then
+    cat | xargs -n 1 -IXXX echo $EXECCMD XXX $ytarcQL
+    exit 1
 else
-	if [[ -n "$SHOWCMD" ]]; then
-	    cat | xargs -n 1 -IXXX echo $EXECCMD XXX $ytarcQL
-	    exit 1
-	else
-	    cat | xargs -n 1 -P $MAXTHREAD -IXXX $EXECCMD XXX $ytarcQL
-	    exit 1
-	fi
+    cat | xargs -n 1 -P $MAXTHREAD -IXXX $EXECCMD XXX $ytarcQL
+    exit 1
 fi
